@@ -69,5 +69,85 @@
         </div>
     </div>
 </body>
+<script src="./libs/http.js"></script>
+<script>
+
+    $(function () {
+        // 1.一进入到个人信息 页面发送ajax请求
+        $.ajax({
+            type: 'get',
+            url: BigNew.user_detail,
+            success: function (backData) {
+                // console.log(backData);
+                if (backData.code == 200) {
+                    // $('input.username').val(backData.data.username);
+                    // $('input.nickname').val(backData.data.nickname);
+                    // $('input.password').val(backData.data.password);
+                    // $('input.email').val(backData.data.email);
+                    // 优化代码
+                    for (var key in backData.data) {
+                        $('input.' + key).val(backData.data[key]);
+                    }
+
+                    $('.user_pic').attr('src', backData.data.userPic);
+                }
+
+            }
+        })
+
+        //二.图片预览
+        $('#exampleInputFile').on('change', function () {
+            // 1.获取你选中的图片
+            var iconFile = this.files[0];
+            // 2.通过URL对象创建一个url
+            var url = URL.createObjectURL(iconFile);
+            // 3.把创建出来的url交给预览用的img的src属性
+            $('img.user_pic').attr('src', url);
+
+        })
+
+        //三.图片修改按钮
+        $('.btn-edit').on('click', function (e) {
+            e.preventDefault(); // 阻止默认跳转
+            // 1.创建new FormData表单对象
+            var fd = new FormData($('#form')[0]);
+            $.ajax({
+
+                type: 'post',
+                url: BigNew.user_edit,
+                data: fd,
+                contentType: false,
+                processData: false,
+                success: function (backData) {
+                    // console.log(backData);
+                    if (backData.code == 200) {
+                        alert('修改成功')
+                        // 第一种方法:
+                        //   parent.window.location.reload();
+
+                        // 第二种方法:
+                        $.ajax({
+                            url: BigNew.user_info,
+                            success: function (backData) {
+                                // console.log(backData);
+                                if (backData.code == 200) {
+                                    parent.$('.user_info>span>i').text(backData.data.nickname);
+                                    parent.$('.user_info>img').attr('src', backData.data.userPic)
+                                    parent.$('.user_center_link>img').attr('src', backData.data.userPic)
+                                }
+                            }
+                        })
+                    }
+
+                }
+            })
+
+
+
+        })
+
+
+    })
+</script>
 
 </html>
